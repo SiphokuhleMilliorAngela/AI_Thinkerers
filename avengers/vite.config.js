@@ -4,5 +4,14 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: './',
+  build: {
+    rollupOptions: {
+      input: {
+        dashboard: 'index.html',
+        popup: 'popup.html',
+      },
+    },
+  },
   plugins: [react(), tailwindcss()],
 })

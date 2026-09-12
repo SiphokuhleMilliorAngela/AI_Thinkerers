@@ -1,6 +1,10 @@
 import { OPENROUTER, TOOL_SERVER_URL } from './extension-config.js'
 import { OPENROUTER_API_KEY } from './extension-secrets.local.js'
 
+const API_BASE = 'http://127.0.0.1:8787'
+const DASHBOARD_URL = 'http://127.0.0.1:5173'
+const SESSION_KEY = 'av.session'
+
 let toolSocket
 let pendingToolCalls = new Map()
 
@@ -129,11 +133,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 async function handleMessage(message) {
   if (message.type === 'auth.login') {
-    return {
-      ok: true,
-      disabled: true,
-      message: 'Authentication is disabled for local testing.',
-    }
+    return login(message.email, message.password)
+  }
+
+  if (message.type === 'auth.me') {
+    return getCurrentUser()
+  }
+
+  if (message.type === 'auth.logout') {
+    return logout()
+  }
+
+  if (message.type === 'dashboard.openAuthenticated') {
+    return openAuthenticatedDashboard(message.view)
   }
 
   if (message.type === 'tabs.read') {
@@ -153,6 +165,79 @@ async function handleMessage(message) {
   }
 
   return { ok: false, error: `Unknown message type: ${message.type}` }
+}
+
+async function login(email, password) {
+  const result = await api('/api/auth/login', {
+    method: 'POST',
+    body: { email, password },
+  })
+  const session = {
+    token: result.token,
+    expiresAt: result.expiresAt,
+    user: result.user,
+  }
+
+  await chrome.storage.local.set({ [SESSION_KEY]: session })
+  await openDashboardWithSession(session.token, 'overview')
+
+  return { ok: true, session, dashboardOpened: true }
+}
+
+async function getCurrentUser() {
+  const values = await chrome.storage.local.get(SESSION_KEY)
+  const session = values[SESSION_KEY]
+
+  if (!session?.token) {
+    return { ok: true, connected: false }
+  }
+
+  try {
+    const result = await api('/api/auth/me', { token: session.token })
+    const refreshedSession = { ...session, user: result.user }
+    await chrome.storage.local.set({ [SESSION_KEY]: refreshedSession })
+    return { ok: true, connected: true, session: refreshedSession }
+  } catch (error) {
+    if (error.status === 401) {
+      await chrome.storage.local.remove(SESSION_KEY)
+      return { ok: true, connected: false, expired: true }
+    }
+    throw error
+  }
+}
+
+async function logout() {
+  const values = await chrome.storage.local.get(SESSION_KEY)
+  const session = values[SESSION_KEY]
+
+  if (session?.token) {
+    await api('/api/auth/logout', {
+      method: 'POST',
+      token: session.token,
+    }).catch(() => {})
+  }
+
+  await chrome.storage.local.remove(SESSION_KEY)
+  return { ok: true, connected: false }
+}
+
+async function openAuthenticatedDashboard(view = 'overview') {
+  const values = await chrome.storage.local.get(SESSION_KEY)
+  const session = values[SESSION_KEY]
+
+  if (!session?.token) {
+    throw new Error('Sign in to AVVA from the extension first.')
+  }
+
+  await openDashboardWithSession(session.token, view)
+  return { ok: true }
+}
+
+async function openDashboardWithSession(token, view = 'overview') {
+  const url = new URL(DASHBOARD_URL)
+  url.searchParams.set('sessionToken', token)
+  url.searchParams.set('view', view)
+  await chrome.tabs.create({ url: url.toString(), active: true })
 }
 
 async function readTabs() {
@@ -555,6 +640,33 @@ function trimText(text = '', maxCharacters = 2500) {
   }
 
   return `${text.slice(0, maxCharacters)}...`
+}
+
+async function api(path, { method = 'GET', token, body } = {}) {
+  let response
+
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers: {
+        Accept: 'application/json',
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    })
+  } catch {
+    throw new Error('The local AVVA service is offline. Run npm run dev and try again.')
+  }
+
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const error = new Error(payload.error ?? 'AVVA could not complete this request.')
+    error.status = response.status
+    throw error
+  }
+
+  return payload
 }
 
 async function formatOpenRouterError(response) {

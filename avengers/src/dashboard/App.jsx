@@ -104,7 +104,8 @@ function Brand({ light = false, compact = false }) {
 }
 
 function App() {
-  const [storedToken] = useState(() => window.localStorage.getItem(SESSION_KEY))
+  const [incomingToken] = useState(() => new URLSearchParams(window.location.search).get('sessionToken'))
+  const [storedToken] = useState(() => incomingToken ?? window.localStorage.getItem(SESSION_KEY))
   const [session, setSession] = useState(null)
   const [initializing, setInitializing] = useState(() => Boolean(storedToken))
   const connectionCode = new URLSearchParams(window.location.search).get('code')
@@ -115,7 +116,11 @@ function App() {
     let active = true
     authApi.me(storedToken)
       .then(({ user }) => {
-        if (active) setSession({ token: storedToken, user })
+        if (active) {
+          window.localStorage.setItem(SESSION_KEY, storedToken)
+          setSession({ token: storedToken, user })
+          if (incomingToken) removeSessionTokenFromUrl()
+        }
       })
       .catch(() => window.localStorage.removeItem(SESSION_KEY))
       .finally(() => {
@@ -123,7 +128,7 @@ function App() {
       })
 
     return () => { active = false }
-  }, [storedToken])
+  }, [incomingToken, storedToken])
 
   async function signIn(email, password) {
     const result = await authApi.login(email, password)
@@ -378,7 +383,7 @@ function ConnectionApproval({ session, userCode, onSignOut }) {
 }
 
 function Dashboard({ session, onSignOut }) {
-  const [activeNav, setActiveNav] = useState('Transactions')
+  const [activeNav, setActiveNav] = useState(getInitialDashboardView)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [connections, setConnections] = useState([])
   const [connectionsLoading, setConnectionsLoading] = useState(true)
@@ -644,6 +649,18 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('en-ZA', {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   }).format(new Date(value))
+}
+
+function getInitialDashboardView() {
+  const view = new URLSearchParams(window.location.search).get('view')?.toLowerCase()
+  const match = navItems.find((item) => item.label.toLowerCase() === view)
+  return match?.label ?? 'Overview'
+}
+
+function removeSessionTokenFromUrl() {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('sessionToken')
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
 }
 
 export default App
