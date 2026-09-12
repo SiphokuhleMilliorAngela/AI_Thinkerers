@@ -12,7 +12,7 @@ function App() {
   }
 
   return (
-    <main className="flex min-h-[480px] w-[380px] flex-col gap-4 bg-slate-50 p-5 text-sm text-slate-600">
+    <main className="flex h-screen w-full flex-col gap-4 overflow-y-auto bg-slate-50 p-5 text-sm text-slate-600">
       <section className="flex items-start gap-3">
         <span
           className="mt-2.5 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-600 shadow-[0_0_0_4px_rgba(22,138,90,0.13)]"
@@ -26,12 +26,12 @@ function App() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-2.5 text-left">
+      <section className="flex min-h-0 flex-1 flex-col gap-2.5 text-left">
         <label className="text-[13px] font-bold text-slate-950" htmlFor="goal">
           Agent task
         </label>
         <textarea
-          className="min-h-28 resize-y rounded-lg border border-slate-300 bg-white p-2.5 leading-relaxed text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          className="min-h-40 flex-1 resize-none rounded-lg border border-slate-300 bg-white p-2.5 leading-relaxed text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           id="goal"
           placeholder="Summarize my open tabs and draft the next action..."
           rows="5"

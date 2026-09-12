@@ -3,6 +3,10 @@ import { AUTH0, OPENROUTER, TOOL_SERVER_URL } from './extension-config.js'
 let toolSocket
 let pendingToolCalls = new Map()
 
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+})
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   handleMessage(message)
     .then(sendResponse)

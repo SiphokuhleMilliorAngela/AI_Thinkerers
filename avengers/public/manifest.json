@@ -4,8 +4,10 @@
   "description": "Agent-focused browser extension that reads tabs and calls local Node.js tools.",
   "version": "0.1.0",
   "action": {
-    "default_popup": "index.html",
     "default_title": "av"
+  },
+  "side_panel": {
+    "default_path": "index.html"
   },
   "background": {
     "service_worker": "extension/background.js",
@@ -18,7 +20,14 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["activeTab", "identity", "scripting", "storage", "tabs"],
+  "permissions": [
+    "activeTab",
+    "identity",
+    "sidePanel",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
   "host_permissions": [
     "<all_urls>",
     "https://openrouter.ai/*",

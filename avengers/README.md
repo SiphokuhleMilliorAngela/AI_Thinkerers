@@ -1,6 +1,6 @@
 # av Browser Extension
 
-Boilerplate for an agent-focused browser extension that can read open tabs,
+Boilerplate for an agent-focused browser side-panel extension that can read open tabs,
 authenticate with Auth0, call OpenRouter, and talk to a local Node.js tool server
 over WebSockets.
 
@@ -8,7 +8,7 @@ over WebSockets.
 
 - `src/popup/` contains the React popup UI.
 - `src/styles/` contains Tailwind CSS entry styles.
-- `public/manifest.json` defines the Manifest V3 extension.
+- `public/manifest.json` defines the Manifest V3 side panel extension.
 - `public/extension/background.js` coordinates auth, tab reading, OpenRouter calls, and tool calls.
 - `public/extension/content-script.js` extracts readable text from tabs.
 - `server/index.js` exposes local tools over `ws://localhost:8787`.
