@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="./public/avva-logo.png" alt="AVVA Logo" width="340" />
+<img src="./public/<img width="2172" height="724" alt="avva logo" src="https://github.com/user-attachments/assets/30350804-615b-4843-9f34-3b9d52de43ec" />
+" alt="AVVA Logo" width="340" />
 
 <br />
 <br />
