@@ -1,8 +1,8 @@
 # av Browser Extension
 
-Boilerplate for an agent-focused browser side-panel extension that can read open tabs,
-authenticate with Auth0, call OpenRouter, and talk to a local Node.js tool server
-over WebSockets.
+Boilerplate for an agent-focused browser side-panel extension that can read
+internal web application tabs, authenticate with Auth0, call OpenRouter, and
+talk to a local Node.js tool server over WebSockets.
 
 ## Project Shape
 
@@ -13,6 +13,14 @@ over WebSockets.
 - `public/extension/content-script.js` extracts readable text from tabs.
 - `server/index.js` exposes local tools over `ws://localhost:8787`.
 - `server/tools/` contains OS-backed tool definitions.
+
+## Internal Tool Ideas
+
+- Read the active dashboard simulation tab and summarize the visible workflow state.
+- Compare values across dashboard pages the analyst has open in the same browser window.
+- Draft review notes from the current tab context.
+- Open a local tool request for system metadata or future internal APIs.
+- Keep Auth0 as the gate before exposing analyst actions or protected workflows.
 
 ## Setup
 

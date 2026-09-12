@@ -24,6 +24,10 @@ async function handleMessage(message) {
     return { ok: true, tabs: await readTabs() }
   }
 
+  if (message.type === 'dashboard.read') {
+    return readDashboardTabs(message.query)
+  }
+
   if (message.type === 'tools.ping') {
     return callToolServer({ tool: 'system.info', args: {} })
   }
@@ -76,6 +80,28 @@ async function readTabs() {
   )
 }
 
+async function readDashboardTabs(query = '') {
+  const tabs = await readTabs()
+  const terms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  const candidates = tabs.filter((tab) => {
+    const haystack = `${tab.title ?? ''} ${tab.url ?? ''}`.toLowerCase()
+    const dashboardSignals = ['dashboard', 'simulation', 'localhost', 'payment']
+
+    return [...dashboardSignals, ...terms].some((term) => haystack.includes(term))
+  })
+
+  return {
+    ok: true,
+    tabs,
+    candidates,
+    activeContext: candidates[0] ?? tabs[0] ?? null,
+  }
+}
+
 async function runAgent(goal) {
   const tabs = await readTabs()
   const { accessToken } = await chrome.storage.local.get('accessToken')
@@ -94,7 +120,7 @@ async function runAgent(goal) {
         {
           role: 'system',
           content:
-            'You are a browser agent. Use the supplied tab context and request local tools only when needed.',
+            'You are an internal browser workflow agent. Use supplied tab context from web applications, summarize what is visible, and propose careful next actions. Request local tools only when needed.',
         },
         {
           role: 'user',
