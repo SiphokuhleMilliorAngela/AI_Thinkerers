@@ -22,10 +22,8 @@
   ],
   "permissions": [
     "activeTab",
-    "identity",
     "sidePanel",
     "scripting",
-    "storage",
     "tabs"
   ],
   "host_permissions": [
