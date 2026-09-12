@@ -1,14 +1,16 @@
 {
-  "name": "av",
+  "name": "avva-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "description": "AVVA fraud operations dashboard and Chrome extension login demo",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev.js",
+    "dev:dashboard": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "dev:server": "node server/index.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "tools": "node server/index.js"
+    "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
