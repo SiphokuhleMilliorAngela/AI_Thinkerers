@@ -148,6 +148,14 @@ async function handleMessage(message) {
     return openAuthenticatedDashboard(message.view)
   }
 
+  if (message.type === 'dashboard.navigateTransactions') {
+    return sendToDashboardTab({ type: 'avva.navigateTransactions' })
+  }
+
+  if (message.type === 'dashboard.findFlaggedTransaction') {
+    return sendToDashboardTab({ type: 'avva.findFlaggedTransaction' })
+  }
+
   if (message.type === 'tabs.read') {
     return { ok: true, tabs: await readTabs() }
   }
@@ -240,52 +248,96 @@ async function openDashboardWithSession(token, view = 'overview') {
   await chrome.tabs.create({ url: url.toString(), active: true })
 }
 
-async function readTabs() {
-  const tabs = await chrome.tabs.query({ currentWindow: true })
+async function sendToDashboardTab(message) {
+  const tab = await getDashboardTab()
+  validateReadableTab(tab)
+  return sendToTab(tab.id, message)
+}
 
-  return Promise.all(
-    tabs.map(async (tab) => {
-      try {
-        if (!canReadTab(tab)) {
-          throw new Error('This browser page cannot be read by an extension.')
-        }
+async function getDashboardTab() {
+  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
-        const page = await sendToTab(tab.id, { type: 'page.read' })
-        return { id: tab.id, ...page }
-      } catch (error) {
-        return {
-          id: tab.id,
-          title: tab.title,
-          url: tab.url,
-          text: '',
-          unreadable: error.message,
-        }
-      }
-    }),
+  if (isDashboardTab(activeTab)) {
+    return activeTab
+  }
+
+  const dashboardTabs = await chrome.tabs.query({
+    currentWindow: true,
+    url: [
+      'http://127.0.0.1:5173/*',
+      'http://localhost:5173/*',
+    ],
+  })
+
+  if (dashboardTabs[0]) {
+    await chrome.tabs.update(dashboardTabs[0].id, { active: true })
+    return dashboardTabs[0]
+  }
+
+  const values = await chrome.storage.local.get(SESSION_KEY)
+  const session = values[SESSION_KEY]
+
+  if (!session?.token) {
+    throw new Error('Open the AVVA dashboard tab or sign in from the extension first.')
+  }
+
+  const url = new URL(DASHBOARD_URL)
+  url.searchParams.set('sessionToken', session.token)
+  url.searchParams.set('view', 'overview')
+  const tab = await chrome.tabs.create({ url: url.toString(), active: true })
+  await wait(900)
+  return tab
+}
+
+function isDashboardTab(tab) {
+  return Boolean(
+    tab?.url?.startsWith('http://127.0.0.1:5173/') ||
+    tab?.url?.startsWith('http://localhost:5173/'),
   )
 }
 
-async function readDashboardTabs(query = '') {
-  const tabs = await readTabs()
-  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true })
-  const terms = query
-    .toLowerCase()
-    .split(/\s+/)
-    .filter(Boolean)
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
-  const candidates = tabs.filter((tab) => {
-    const haystack = `${tab.title ?? ''} ${tab.url ?? ''}`.toLowerCase()
-    const dashboardSignals = ['dashboard', 'simulation', 'localhost', 'payment']
+async function readTabs() {
+  return [await readActiveTabSnapshot()]
+}
 
-    return [...dashboardSignals, ...terms].some((term) => haystack.includes(term))
-  })
+async function readActiveTabSnapshot() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+  if (!tab?.id) {
+    throw new Error('No active browser tab found.')
+  }
+
+  try {
+    if (!canReadTab(tab)) {
+      throw new Error('This browser page cannot be read by an extension.')
+    }
+
+    const page = await sendToTab(tab.id, { type: 'page.read' })
+    return { id: tab.id, ...page }
+  } catch (error) {
+    return {
+      id: tab.id,
+      title: tab.title,
+      url: tab.url,
+      text: '',
+      unreadable: error.message,
+    }
+  }
+}
+
+async function readDashboardTabs() {
+  const activeContext = await readActiveTabSnapshot()
 
   return {
     ok: true,
-    tabs,
-    candidates,
-    activeContext:
-      candidates.find((tab) => tab.id === activeTab?.id) ?? candidates[0] ?? tabs[0] ?? null,
+    tabs: [activeContext],
+    candidates: [activeContext],
+    activeContext,
+    note: 'Only the current active tab was read.',
   }
 }
 
@@ -592,22 +644,17 @@ function normalizeMessages(messages) {
 }
 
 async function selectRelevantTabs(tabs, openRouter, contextTabId) {
-  const dashboardSignals = ['dashboard', 'simulation', 'localhost', 'payment']
-  const sortedTabs = [...tabs].sort((a, b) => {
-    return scoreTab(b, dashboardSignals) - scoreTab(a, dashboardSignals)
-  })
-  const selectedTab = contextTabId ? await getReadableTabSnapshot(contextTabId) : null
-  const withoutSelected = sortedTabs.filter((tab) => tab.id !== selectedTab?.id)
+  const targetTab = contextTabId ? await getReadableTabSnapshot(contextTabId) : tabs[0]
 
-  return [selectedTab, ...withoutSelected]
+  return [targetTab]
     .filter(Boolean)
-    .slice(0, openRouter.maxTabs)
+    .slice(0, Math.min(openRouter.maxTabs, 1))
     .map((tab) => ({
-    id: tab.id,
-    title: tab.title,
-    url: tab.url,
-    text: trimText(tab.text, openRouter.maxTabTextCharacters),
-  }))
+      id: tab.id,
+      title: tab.title,
+      url: tab.url,
+      text: trimText(tab.text, openRouter.maxTabTextCharacters),
+    }))
 }
 
 async function getReadableTabSnapshot(tabId) {
@@ -625,13 +672,6 @@ async function getReadableTabSnapshot(tabId) {
       unreadable: error.message,
     }
   }
-}
-
-function scoreTab(tab, signals) {
-  const haystack = `${tab.title ?? ''} ${tab.url ?? ''}`.toLowerCase()
-  return signals.reduce((score, signal) => {
-    return haystack.includes(signal) ? score + 1 : score
-  }, tab.text ? 1 : 0)
 }
 
 function trimText(text = '', maxCharacters = 2500) {
@@ -686,6 +726,10 @@ async function formatOpenRouterError(response) {
         body.message ??
         body.detail ??
         JSON.stringify(body)
+
+      if (response.status === 402 && /in-flight requests/i.test(message)) {
+        return `${fallback} - OpenRouter is still processing another request for this key. Wait a moment and try again, or use local dashboard actions such as Open overview, Read current tab, or Find flagged transaction.`
+      }
 
       return `${fallback} - ${message}`
     } catch {

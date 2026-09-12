@@ -19,7 +19,7 @@ function App() {
   const [status, setStatus] = useState('Checking session...')
   const [session, setSession] = useState(null)
   const [authChecked, setAuthChecked] = useState(false)
-  const [dashboardTabs, setDashboardTabs] = useState([])
+  const [targetTab, setTargetTab] = useState(null)
   const [selectedTabId, setSelectedTabId] = useState(null)
   const [messages, setMessages] = useState(initialMessages)
   const [draft, setDraft] = useState('')
@@ -80,7 +80,7 @@ function App() {
     try {
       await sendToBackground({ type: 'auth.logout' })
       setSession(null)
-      setDashboardTabs([])
+      setTargetTab(null)
       setSelectedTabId(null)
       setMessages(initialMessages)
       setStatus('Signed out.')
@@ -104,30 +104,41 @@ function App() {
     }
   }
 
-  const readDashboard = async () => {
+  const readCurrentTab = async () => {
     setIsWorking(true)
-    setStatus('Reading tabs...')
+    setStatus('Reading current tab...')
 
-    const response = await sendToAgent({
-      type: 'dashboard.read',
-      query: 'dashboard simulation',
-    })
+    try {
+      const response = await sendToAgent({
+        type: 'dashboard.read',
+        query: 'dashboard simulation',
+      })
 
-    if (response?.ok) {
-      setDashboardTabs(response.candidates)
-      setSelectedTabId(response.activeContext?.id ?? response.candidates[0]?.id ?? null)
+      if (response?.ok) {
+        setTargetTab(response.activeContext ?? null)
+        setSelectedTabId(response.activeContext?.id ?? null)
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: response.activeContext
+              ? `I can see the current tab: "${response.activeContext.title}". Ask a follow-up and I will use only that tab.`
+              : 'I could not read the current tab. Open the dashboard overview and try again.',
+          },
+        ])
+      }
+    } catch (error) {
+      setStatus(error.message)
       setMessages((current) => [
         ...current,
         {
           role: 'assistant',
-          content: response.activeContext
-            ? `I can see "${response.activeContext.title}". Ask a follow-up and I will use that tab context.`
-            : 'I could not find a dashboard-like tab yet. Open the dashboard overview and try again.',
+          content: `I could not read the current tab: ${error.message}`,
         },
       ])
+    } finally {
+      setIsWorking(false)
     }
-
-    setIsWorking(false)
   }
 
   const sendPrompt = async () => {
@@ -141,22 +152,126 @@ function App() {
     setMessages(nextMessages)
     setDraft('')
     setIsWorking(true)
+
+    if (isOpenOverviewRequest(content)) {
+      setStatus('Opening dashboard...')
+      try {
+        await sendToBackground({ type: 'dashboard.openAuthenticated', view: 'overview' })
+        setStatus('Dashboard overview opened.')
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: 'Opened the dashboard Overview page.',
+          },
+        ])
+      } catch (error) {
+        setStatus(error.message)
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: `I could not open the dashboard overview: ${error.message}`,
+          },
+        ])
+      } finally {
+        setIsWorking(false)
+      }
+      return
+    }
+
+    if (isFindFlaggedTransactionRequest(content)) {
+      setStatus('Finding flagged transaction...')
+      try {
+        const response = await sendToBackground({ type: 'dashboard.findFlaggedTransaction' })
+        const transaction = response.selectedTransaction ?? response.transaction
+        setStatus(response.found ? 'Flagged transaction opened.' : 'No flagged transaction found.')
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: response.found
+              ? `Opened flagged transaction ${transaction.transactionId} (${transaction.riskLevel} risk).`
+              : response.reason,
+          },
+        ])
+      } catch (error) {
+        setStatus(error.message)
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: `I could not find the flagged transaction: ${error.message}`,
+          },
+        ])
+      } finally {
+        setIsWorking(false)
+      }
+      return
+    }
+
+    if (isNavigateTransactionsRequest(content)) {
+      setStatus('Opening Transactions...')
+      try {
+        await sendToBackground({ type: 'dashboard.navigateTransactions' })
+        setStatus('Transactions opened.')
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: 'Opened the dashboard Transactions page.',
+          },
+        ])
+      } catch (error) {
+        setStatus(error.message)
+        setMessages((current) => [
+          ...current,
+          {
+            role: 'assistant',
+            content: `I could not open Transactions: ${error.message}`,
+          },
+        ])
+      } finally {
+        setIsWorking(false)
+      }
+      return
+    }
+
     setStatus('Asking OpenRouter...')
 
-    const response = await sendToAgent({
-      type: 'agent.run',
-      messages: nextMessages,
-      contextTabId: selectedTabId,
-    })
+    try {
+      const response = await sendToAgent({
+        type: 'agent.run',
+        messages: nextMessages,
+        contextTabId: selectedTabId,
+      })
 
-    setMessages((current) => [
-      ...current,
-      {
-        role: 'assistant',
-        content: response?.ok ? String(response.result) : response?.error ?? 'No response returned.',
-      },
-    ])
-    setIsWorking(false)
+      setMessages((current) => [
+        ...current,
+        {
+          role: 'assistant',
+          content: response?.ok ? String(response.result) : response?.error ?? 'No response returned.',
+        },
+      ])
+    } catch (error) {
+      const handled = await tryLocalDashboardFallback(content, error)
+
+      if (handled) {
+        setMessages((current) => [...current, handled])
+        return
+      }
+
+      setStatus(error.message)
+      setMessages((current) => [
+        ...current,
+        {
+          role: 'assistant',
+          content: `I could not complete that request: ${error.message}`,
+        },
+      ])
+    } finally {
+      setIsWorking(false)
+    }
   }
 
   const clearChat = () => {
@@ -209,7 +324,7 @@ function App() {
             </span>
           </div>
           <p className="mt-2 text-xs text-emerald-800">
-            {status}. Open the dashboard overview, then ask the agent to inspect visible tabs.
+            {status}. Open the dashboard overview, then ask the agent to inspect the current tab.
           </p>
         </section>
       </header>
@@ -238,32 +353,21 @@ function App() {
             <button className={primaryButtonClass} type="button" onClick={openDashboard} disabled={isWorking}>
               Open overview
             </button>
-            <button className={buttonClass} type="button" onClick={readDashboard} disabled={isWorking}>
-              Read tabs
+            <button className={buttonClass} type="button" onClick={readCurrentTab} disabled={isWorking}>
+              Read current tab
             </button>
           </div>
-          {dashboardTabs.length > 0 ? (
-            <ul className="mt-2 space-y-2">
-              {dashboardTabs.map((tab) => (
-                <li key={tab.id}>
-                  <button
-                    className={`w-full rounded-md border p-2 text-left ${
-                      selectedTabId === tab.id
-                        ? 'border-blue-300 bg-blue-50'
-                        : 'border-transparent bg-white hover:border-slate-200'
-                    }`}
-                    type="button"
-                    onClick={() => setSelectedTabId(tab.id)}
-                  >
-                    <p className="truncate font-semibold text-slate-800">{tab.title}</p>
-                    <p className="truncate text-xs text-slate-500">{tab.url}</p>
-                  </button>
-                </li>
-              ))}
-            </ul>
+          {targetTab ? (
+            <section className="mt-2 rounded-md border border-blue-300 bg-blue-50 p-2 text-left">
+              <p className="truncate font-semibold text-slate-800">{targetTab.title}</p>
+              <p className="truncate text-xs text-slate-500">{targetTab.url}</p>
+              {targetTab.unreadable && (
+                <p className="mt-1 text-xs font-semibold text-amber-700">{targetTab.unreadable}</p>
+              )}
+            </section>
           ) : (
             <p className="mt-2 text-xs text-slate-500">
-              Open the dashboard overview in this browser window, then read tabs.
+              Open the dashboard overview in the active tab, then read the current tab.
             </p>
           )}
         </section>
@@ -366,7 +470,13 @@ function sendToBackground(message) {
   }
 
   return new Promise((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      reject(new Error(`Extension background timed out while handling ${message.type}.`))
+    }, 30000)
+
     chrome.runtime.sendMessage(message, (response) => {
+      window.clearTimeout(timeout)
+
       if (chrome.runtime.lastError) {
         reject(new Error(chrome.runtime.lastError.message))
         return
@@ -380,6 +490,65 @@ function sendToBackground(message) {
       resolve(response)
     })
   })
+}
+
+function isOpenOverviewRequest(content) {
+  const normalized = content.toLowerCase()
+  return (
+    /\b(open|go to|show|launch)\b/.test(normalized) &&
+    /\b(dashboard|overview)\b/.test(normalized)
+  )
+}
+
+function isNavigateTransactionsRequest(content) {
+  const normalized = content.toLowerCase()
+  return (
+    /\b(open|go to|show|launch|navigate|find|view|take me|check|list)\b/.test(normalized) &&
+    /\b(transaction|transactions)\b/.test(normalized)
+  )
+}
+
+function isFindFlaggedTransactionRequest(content) {
+  const normalized = content.toLowerCase()
+  return (
+    /\b(flag|flags|flagged|critical|high risk|suspicious|dodgy|risky)\b/.test(normalized) &&
+    /\b(transaction|transactions|payment|payments|request|requests)\b/.test(normalized)
+  )
+}
+
+async function tryLocalDashboardFallback(content, error) {
+  if (!/openrouter request failed: 402/i.test(error.message)) {
+    return null
+  }
+
+  if (isFindFlaggedTransactionRequest(content)) {
+    const response = await sendToBackground({ type: 'dashboard.findFlaggedTransaction' })
+    const transaction = response.selectedTransaction ?? response.transaction
+    return {
+      role: 'assistant',
+      content: response.found
+        ? `OpenRouter was busy, so I used the local dashboard skill instead. Opened flagged transaction ${transaction.transactionId} (${transaction.riskLevel} risk).`
+        : `OpenRouter was busy, so I used the local dashboard skill instead. ${response.reason}`,
+    }
+  }
+
+  if (isNavigateTransactionsRequest(content)) {
+    await sendToBackground({ type: 'dashboard.navigateTransactions' })
+    return {
+      role: 'assistant',
+      content: 'OpenRouter was busy, so I used the local dashboard skill instead. Opened the dashboard Transactions page.',
+    }
+  }
+
+  if (isOpenOverviewRequest(content)) {
+    await sendToBackground({ type: 'dashboard.openAuthenticated', view: 'overview' })
+    return {
+      role: 'assistant',
+      content: 'OpenRouter was busy, so I used the local dashboard skill instead. Opened the dashboard Overview page.',
+    }
+  }
+
+  return null
 }
 
 export default App

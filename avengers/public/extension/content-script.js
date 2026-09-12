@@ -34,6 +34,14 @@ async function handlePageCommand(message) {
     return draftReply(message.body)
   }
 
+  if (message.type === 'avva.navigateTransactions') {
+    return navigateAvvaSection('transactions')
+  }
+
+  if (message.type === 'avva.findFlaggedTransaction') {
+    return findFlaggedAvvaTransaction()
+  }
+
   return { ok: false, error: `Unknown page command: ${message.type}` }
 }
 
@@ -100,6 +108,94 @@ async function draftReply(body = '') {
     action: 'draft_reply',
     characters: body.length,
     note: 'Draft created. Send is intentionally not clicked.',
+  }
+}
+
+async function navigateAvvaSection(section) {
+  const button = findActionElement(section)
+
+  if (!button) {
+    throw new Error(`Could not find the ${section} navigation control on this page.`)
+  }
+
+  button.click()
+  await wait(300)
+
+  return {
+    ok: true,
+    action: 'navigate_dashboard_section',
+    section,
+    title: document.title,
+    text: (document.body?.innerText ?? '').replace(/\s+/g, ' ').trim().slice(0, 1200),
+  }
+}
+
+async function findFlaggedAvvaTransaction() {
+  if (!document.querySelector('[data-avva-page="transactions"]')) {
+    await navigateAvvaSection('transactions')
+  }
+
+  const flagged = await waitForElement(() => {
+    const rows = [...document.querySelectorAll('tr[data-avva-transaction-id]')]
+    return rows.find((row) => /critical|high/i.test(row.dataset.avvaRisk ?? ''))
+  }, 5000)
+
+  if (!flagged) {
+    return {
+      ok: true,
+      found: false,
+      action: 'find_flagged_transaction',
+      reason: 'No Critical or High risk transaction rows are visible on the Transactions page.',
+      visibleTransactions: readAvvaTransactionRows(),
+    }
+  }
+
+  flagged.scrollIntoView({ block: 'center', inline: 'nearest' })
+  flagged.click()
+  await wait(300)
+
+  return {
+    ok: true,
+    found: true,
+    action: 'find_flagged_transaction',
+    transaction: readAvvaTransactionRow(flagged),
+    selectedTransaction: readAvvaSelectedTransaction(),
+  }
+}
+
+function readAvvaTransactionRows() {
+  return [...document.querySelectorAll('tr[data-avva-transaction-id]')]
+    .slice(0, 40)
+    .map(readAvvaTransactionRow)
+}
+
+function readAvvaTransactionRow(row) {
+  return {
+    transactionId: row.dataset.avvaTransactionId || null,
+    amount: Number(row.dataset.avvaAmount || 0),
+    currency: row.dataset.avvaCurrency || 'ZAR',
+    customerId: row.dataset.avvaCustomerId || null,
+    beneficiaryId: row.dataset.avvaBeneficiaryId || null,
+    riskLevel: row.dataset.avvaRisk || 'Unknown',
+    status: row.dataset.avvaStatus || 'Unknown',
+    text: (row.innerText ?? '').replace(/\s+/g, ' ').trim().slice(0, 700),
+  }
+}
+
+function readAvvaSelectedTransaction() {
+  const detail = document.querySelector('[data-avva-transaction-detail="true"]')
+
+  if (!detail) {
+    return null
+  }
+
+  return {
+    transactionId: detail.dataset.avvaTransactionId || null,
+    amount: Number(detail.dataset.avvaAmount || 0),
+    currency: detail.dataset.avvaCurrency || 'ZAR',
+    beneficiaryId: detail.dataset.avvaBeneficiaryId || null,
+    riskLevel: detail.dataset.avvaRisk || 'Unknown',
+    text: (detail.innerText ?? '').replace(/\s+/g, ' ').trim().slice(0, 1800),
   }
 }
 

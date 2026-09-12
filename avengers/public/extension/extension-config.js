@@ -8,7 +8,7 @@ export const OPENROUTER = {
   endpoint: 'https://openrouter.ai/api/v1/chat/completions',
   apiKey: 'YOUR_OPENROUTER_API_KEY',
   model: 'openai/gpt-4o',
-  maxCompletionTokens: 800,
+  maxCompletionTokens: 400,
   maxTabs: 4,
   maxTabTextCharacters: 2500,
   siteUrl: 'http://localhost:5173',
