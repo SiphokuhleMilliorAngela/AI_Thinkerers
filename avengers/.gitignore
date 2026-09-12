@@ -14,6 +14,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+public/extension/extension-secrets.local.js
 
 # Editor directories and files
 .vscode/*

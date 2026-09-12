@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "av",
+  "description": "Agent-focused browser extension that reads tabs and calls local Node.js tools.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "av"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "background": {
+    "service_worker": "extension/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["extension/content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "sidePanel",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://openrouter.ai/*",
+    "https://*.auth0.com/*",
+    "http://localhost:8787/*",
+    "ws://localhost:8787/*"
+  ]
+}

@@ -8,6 +8,7 @@
     "dev": "node scripts/dev.js",
     "dev:dashboard": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "dev:server": "node server/index.js",
+    "prebuild": "node scripts/sync-extension-secrets.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview --host 127.0.0.1"
