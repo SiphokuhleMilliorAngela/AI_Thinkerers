@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f5f1" />
+    <title>AVVA</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="panel-shell">
+      <header class="panel-header">
+        <div class="brand" aria-label="AVVA"><span class="brand-mark">A</span><span>vva</span></div>
+        <span class="service-status" id="service-status"><i></i><span>Checking service</span></span>
+      </header>
+
+      <section class="view view--active" id="loading-view" aria-live="polite">
+        <div class="loading-stage">
+          <span class="loading-mark">A</span>
+          <span class="loading-dots"><i></i><i></i><i></i></span>
+        </div>
+      </section>
+
+      <section class="view" id="signed-out-view">
+        <div class="hero-visual" aria-hidden="true">
+          <span class="hero-browser">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>
+          </span>
+          <span class="hero-link"><i></i><i></i><i></i></span>
+          <span class="hero-avva">A</span>
+        </div>
+        <span class="eyebrow">YOUR AI FRAUD WORKSPACE</span>
+        <h1>AVVA, right where you work.</h1>
+        <p class="lead">Connect this extension to your fraud operations dashboard using your AVVA account.</p>
+
+        <div class="trust-list">
+          <div><span class="check-icon">✓</span><p><strong>One secure identity</strong><small>Use the same profile and role as the dashboard</small></p></div>
+          <div><span class="check-icon">✓</span><p><strong>Explicit approval</strong><small>You decide which browsers can connect</small></p></div>
+          <div><span class="lock-icon">⌁</span><p><strong>No password sharing</strong><small>The extension gets a separate revocable token</small></p></div>
+        </div>
+
+        <button class="primary-button" id="connect-button"><span>Connect dashboard</span><b>→</b></button>
+        <p class="local-note">Local demo · Dashboard at 127.0.0.1:5173</p>
+      </section>
+
+      <section class="view" id="pending-view" aria-live="polite">
+        <div class="pending-visual">
+          <span class="pulse-ring"><span class="browser-mini">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg>
+          </span></span>
+        </div>
+        <span class="eyebrow">WAITING FOR APPROVAL</span>
+        <h1>Finish connecting in AVVA.</h1>
+        <p class="lead">Sign in to the dashboard tab we opened, then approve this browser extension.</p>
+
+        <div class="code-card">
+          <span>CONNECTION CODE</span>
+          <strong id="connection-code">AVVA-••••</strong>
+          <small id="expiry-copy">Expires in 10 minutes</small>
+        </div>
+
+        <ol class="steps">
+          <li class="steps__done"><span>✓</span><p><strong>Connection requested</strong><small>This browser is ready</small></p></li>
+          <li class="steps__active"><span>2</span><p><strong>Approve in dashboard</strong><small>Waiting for your confirmation…</small></p></li>
+          <li><span>3</span><p><strong>Return to AVVA</strong><small>Sign-in completes automatically</small></p></li>
+        </ol>
+
+        <button class="secondary-button" id="reopen-button">Open approval page <b>↗</b></button>
+        <button class="quiet-button" id="cancel-button">Cancel connection</button>
+      </section>
+
+      <section class="view" id="connected-view">
+        <div class="account-hero">
+          <div class="avatar" id="user-avatar">NM</div>
+          <span class="connected-badge"><i></i> Connected</span>
+          <h1 id="welcome-name">Welcome, Naledi.</h1>
+          <p>Signed in to your AVVA workspace.</p>
+        </div>
+
+        <div class="account-card">
+          <div class="account-row"><span>ACCOUNT</span><p><strong id="user-email">naledi@avva.co.za</strong><small id="user-team">Fraud Operations</small></p></div>
+          <div class="account-row"><span>ACCESS</span><p><strong id="user-role">Fraud Manager</strong><small>Managed by your dashboard profile</small></p></div>
+          <div class="session-safe"><span>✓</span><p><strong>Extension access is protected</strong><small>Revoke this browser any time from Dashboard → Settings.</small></p></div>
+        </div>
+
+        <div class="context-card" id="context-card">
+          <header><span>PAGE CONTEXT</span><button id="context-refresh" aria-label="Refresh page context">↻</button></header>
+          <div class="context-empty" id="context-empty">
+            <span class="context-ready-mark">A</span>
+            <p><strong id="context-title">Open the AVVA dashboard</strong><small id="context-copy">Select a transaction to make it available to the agent.</small></p>
+          </div>
+          <div class="context-transaction" id="context-transaction" hidden>
+            <div><span id="context-id">TX-00000</span><strong id="context-amount">R0.00</strong></div>
+            <div><span class="context-risk" id="context-risk"><i></i> Unknown risk</span><small id="context-signals">Structured context ready</small></div>
+          </div>
+        </div>
+
+        <button class="primary-button" id="dashboard-button"><span>Open AVVA dashboard</span><b>→</b></button>
+        <button class="quiet-button quiet-button--danger" id="signout-button">Disconnect this extension</button>
+      </section>
+
+      <div class="toast" id="toast" role="alert"><span>!</span><p id="toast-copy"></p><button id="toast-close" aria-label="Dismiss">×</button></div>
+
+      <footer class="panel-footer"><span><i></i> AVVA local prototype</span><span>v0.1</span></footer>
+    </main>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

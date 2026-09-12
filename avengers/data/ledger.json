@@ -1,0 +1,124 @@
+{
+  "accounts": [
+    {
+      "id": "ACC-1001",
+      "name": "Ubuntu Marketplaces",
+      "type": "Business Current Account",
+      "accountNumber": "•••• 4821",
+      "currency": "ZAR",
+      "balance": 248560.75,
+      "availableBalance": 242310.75,
+      "status": "Active",
+      "customerId": "CUST-2810"
+    },
+    {
+      "id": "ACC-1002",
+      "name": "Ubuntu Payroll",
+      "type": "Business Cheque Account",
+      "accountNumber": "•••• 7714",
+      "currency": "ZAR",
+      "balance": 684200,
+      "availableBalance": 684200,
+      "status": "Active",
+      "customerId": "CUST-2810"
+    },
+    {
+      "id": "ACC-1003",
+      "name": "Ubuntu Reserve",
+      "type": "Money Market Account",
+      "accountNumber": "•••• 1906",
+      "currency": "ZAR",
+      "balance": 1250000,
+      "availableBalance": 1250000,
+      "status": "Active",
+      "customerId": "CUST-2810"
+    }
+  ],
+  "beneficiaries": [
+    { "id": "BEN-4420", "name": "Cape Office Supplies", "bank": "FNB", "accountNumber": "•••• 1108", "reference": "UBUNTU OFFICE", "status": "Trusted", "createdAt": "2024-03-12T09:20:00+02:00" },
+    { "id": "BEN-5514", "name": "Mzansi Logistics", "bank": "Standard Bank", "accountNumber": "•••• 6652", "reference": "UBUNTU LOGISTICS", "status": "Trusted", "createdAt": "2023-08-22T11:05:00+02:00" },
+    { "id": "BEN-7721", "name": "Kanyisa Trading", "bank": "TymeBank", "accountNumber": "•••• 3094", "reference": "KT SERVICES", "status": "New", "createdAt": "2026-09-12T00:17:00+02:00", "createdBy": "EMP-4412" },
+    { "id": "BEN-6102", "name": "Ubuntu Cloud Services", "bank": "Nedbank", "accountNumber": "•••• 8820", "reference": "CLOUD HOSTING", "status": "Trusted", "createdAt": "2024-11-05T14:12:00+02:00" },
+    { "id": "BEN-9931", "name": "City Power Johannesburg", "bank": "Absa", "accountNumber": "•••• 4021", "reference": "ELEC 84219", "status": "Trusted", "createdAt": "2022-06-18T08:45:00+02:00" },
+    { "id": "BEN-8210", "name": "Ubuntu Payroll Clearing", "bank": "Standard Bank", "accountNumber": "•••• 1770", "reference": "MONTHLY PAYROLL", "status": "Trusted", "createdAt": "2022-01-10T10:00:00+02:00" },
+    { "id": "BEN-3477", "name": "Lebo Consulting", "bank": "Capitec Business", "accountNumber": "•••• 5166", "reference": "CONSULTING", "status": "Verified", "createdAt": "2025-07-16T13:40:00+02:00" },
+    { "id": "BEN-1145", "name": "South African Revenue Service", "bank": "SARB", "accountNumber": "•••• 0001", "reference": "VAT PAYMENT", "status": "Trusted", "createdAt": "2022-02-14T09:10:00+02:00" }
+  ],
+  "transactions": [
+    {
+      "id": "TX-10511", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "EFT settlement", "amount": 87250, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-12T10:42:00+02:00", "description": "Marketplace card settlement", "counterparty": "Stitch Settlement Services", "reference": "SETTLE-1209", "channel": "API", "deviceId": "DEV-SYSTEM", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10510", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-4420", "direction": "debit", "type": "EFT payment", "amount": 4200, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-12T09:18:00+02:00", "description": "September stationery order", "counterparty": "Cape Office Supplies", "reference": "INV-8812", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 5100 }
+    },
+    {
+      "id": "TX-10508", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-5514", "direction": "debit", "type": "Immediate payment", "amount": 12850, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-12T08:46:00+02:00", "description": "Regional delivery services", "counterparty": "Mzansi Logistics", "reference": "DEL-0909", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 11800 }
+    },
+    {
+      "id": "TX-10502", "accountId": "ACC-1001", "customerId": "CUST-5108", "beneficiaryId": "BEN-7721", "direction": "debit", "type": "Immediate payment", "amount": 30000, "currency": "ZAR", "status": "Pending review", "timestamp": "2026-09-12T02:04:00+02:00", "description": "Consulting retainer", "counterparty": "Kanyisa Trading", "reference": "CONSULT-3", "channel": "Web", "deviceId": "DEV-9021", "employeeId": "EMP-4412", "riskFactors": { "customerAverageAmount": 4200, "beneficiaryAgeMinutes": 107, "afterHours": true, "deviceAccountCount": 3, "linkedTransactionCount": 2, "previousAlerts": 1 }
+    },
+    {
+      "id": "TX-10491", "accountId": "ACC-1001", "customerId": "CUST-3901", "beneficiaryId": "BEN-7721", "direction": "debit", "type": "Immediate payment", "amount": 31800, "currency": "ZAR", "status": "Pending review", "timestamp": "2026-09-12T01:12:00+02:00", "description": "Supplier deposit", "counterparty": "Kanyisa Trading", "reference": "SUPPLY-DEP", "channel": "Web", "deviceId": "DEV-9021", "employeeId": "EMP-4412", "riskFactors": { "customerAverageAmount": 3900, "beneficiaryAgeMinutes": 55, "afterHours": true, "sameEmployeeCreatedAndApproved": true, "deviceAccountCount": 3, "linkedTransactionCount": 2 }
+    },
+    {
+      "id": "TX-10488", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-7721", "direction": "debit", "type": "Immediate payment", "amount": 34500, "currency": "ZAR", "status": "Pending review", "timestamp": "2026-09-12T00:28:00+02:00", "description": "New supplier payment", "counterparty": "Kanyisa Trading", "reference": "KT-INITIAL", "channel": "Web", "deviceId": "DEV-9021", "employeeId": "EMP-4412", "riskFactors": { "customerAverageAmount": 4420, "beneficiaryAgeMinutes": 11, "afterHours": true, "sameEmployeeCreatedAndApproved": true, "deviceAccountCount": 3, "linkedTransactionCount": 2, "previousAlerts": 2 }
+    },
+    {
+      "id": "TX-10472", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-6102", "direction": "debit", "type": "Scheduled payment", "amount": 8950, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-11T15:30:00+02:00", "description": "Cloud platform subscription", "counterparty": "Ubuntu Cloud Services", "reference": "CLOUD-SEP", "channel": "Scheduled", "deviceId": "DEV-SYSTEM", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 8900 }
+    },
+    {
+      "id": "TX-10465", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "Customer payment", "amount": 18340.5, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-11T13:14:00+02:00", "description": "Merchant order receipts", "counterparty": "Naledi Homeware", "reference": "ORDER-BATCH-44", "channel": "EFT", "deviceId": "DEV-EXT", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10458", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-9931", "direction": "debit", "type": "Bill payment", "amount": 6325.4, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-11T10:02:00+02:00", "description": "Johannesburg electricity", "counterparty": "City Power Johannesburg", "reference": "ELEC-84219", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204"
+    },
+    {
+      "id": "TX-10441", "accountId": "ACC-1002", "customerId": "CUST-2810", "beneficiaryId": "BEN-8210", "direction": "debit", "type": "Payroll", "amount": 184250, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-10T08:00:00+02:00", "description": "September payroll batch", "counterparty": "Ubuntu Payroll Clearing", "reference": "PAYROLL-SEP", "channel": "File upload", "deviceId": "DEV-3301", "employeeId": "EMP-1180", "riskFactors": { "expectedPayroll": true }
+    },
+    {
+      "id": "TX-10434", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-3477", "direction": "debit", "type": "EFT payment", "amount": 17500, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-09T16:22:00+02:00", "description": "Operations consulting", "counterparty": "Lebo Consulting", "reference": "LEBO-0926", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 16000 }
+    },
+    {
+      "id": "TX-10420", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "Card settlement", "amount": 46680.25, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-09T06:40:00+02:00", "description": "Daily card settlement", "counterparty": "Stitch Settlement Services", "reference": "SETTLE-0909", "channel": "API", "deviceId": "DEV-SYSTEM", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10411", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-5514", "direction": "debit", "type": "EFT payment", "amount": 9750, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-08T14:36:00+02:00", "description": "Cape Town deliveries", "counterparty": "Mzansi Logistics", "reference": "DEL-0908", "channel": "Mobile", "deviceId": "DEV-5530", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 11800 }
+    },
+    {
+      "id": "TX-10398", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-4420", "direction": "debit", "type": "Card payment", "amount": 1280.99, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-08T11:17:00+02:00", "description": "Printer toner and labels", "counterparty": "Cape Office Supplies", "reference": "CARD 1108", "channel": "Card", "deviceId": "CARD-4821", "employeeId": "EMP-2204"
+    },
+    {
+      "id": "TX-10389", "accountId": "ACC-1003", "customerId": "CUST-2810", "direction": "credit", "type": "Interest", "amount": 3842.17, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-07T23:58:00+02:00", "description": "Money market interest", "counterparty": "AVVA Bank", "reference": "INTEREST-SEP", "channel": "System", "deviceId": "DEV-SYSTEM", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10375", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-1145", "direction": "debit", "type": "Tax payment", "amount": 42200, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-07T10:00:00+02:00", "description": "August VAT payment", "counterparty": "South African Revenue Service", "reference": "VAT-2026-08", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-1180", "riskFactors": { "trustedInstitution": true }
+    },
+    {
+      "id": "TX-10361", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "Customer payment", "amount": 7150, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-06T17:45:00+02:00", "description": "Wholesale order payment", "counterparty": "Karoo Living", "reference": "KL-7781", "channel": "EFT", "deviceId": "DEV-EXT", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10349", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-6102", "direction": "debit", "type": "Card payment", "amount": 2199, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-05T12:31:00+02:00", "description": "Email and collaboration tools", "counterparty": "Ubuntu Cloud Services", "reference": "CARD 8820", "channel": "Card", "deviceId": "CARD-4821", "employeeId": "EMP-2204"
+    },
+    {
+      "id": "TX-10333", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-5514", "direction": "debit", "type": "EFT payment", "amount": 11200, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-04T15:08:00+02:00", "description": "Gauteng delivery services", "counterparty": "Mzansi Logistics", "reference": "DEL-0904", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 11800 }
+    },
+    {
+      "id": "TX-10318", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "Refund", "amount": 890.5, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-04T09:12:00+02:00", "description": "Insurance premium adjustment", "counterparty": "Old Mutual Insure", "reference": "REF-6612", "channel": "EFT", "deviceId": "DEV-EXT", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10305", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-4420", "direction": "debit", "type": "EFT payment", "amount": 3680, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-03T13:54:00+02:00", "description": "Packaging supplies", "counterparty": "Cape Office Supplies", "reference": "INV-8744", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204"
+    },
+    {
+      "id": "TX-10294", "accountId": "ACC-1002", "customerId": "CUST-2810", "direction": "credit", "type": "Internal transfer", "amount": 250000, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-02T09:05:00+02:00", "description": "Payroll funding transfer", "counterparty": "Ubuntu Reserve", "reference": "PAYROLL-FUND", "channel": "Web", "deviceId": "DEV-3301", "employeeId": "EMP-1180", "riskFactors": { "trustedInternalTransfer": true }
+    },
+    {
+      "id": "TX-10281", "accountId": "ACC-1003", "customerId": "CUST-2810", "direction": "debit", "type": "Internal transfer", "amount": 250000, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-02T09:05:00+02:00", "description": "Payroll funding transfer", "counterparty": "Ubuntu Payroll", "reference": "PAYROLL-FUND", "channel": "Web", "deviceId": "DEV-3301", "employeeId": "EMP-1180", "riskFactors": { "trustedInternalTransfer": true }
+    },
+    {
+      "id": "TX-10270", "accountId": "ACC-1001", "customerId": "CUST-2810", "direction": "credit", "type": "Card settlement", "amount": 59680.1, "currency": "ZAR", "status": "Completed", "timestamp": "2026-09-01T06:35:00+02:00", "description": "Weekend card settlement", "counterparty": "Stitch Settlement Services", "reference": "SETTLE-0109", "channel": "API", "deviceId": "DEV-SYSTEM", "employeeId": "EMP-SYSTEM"
+    },
+    {
+      "id": "TX-10255", "accountId": "ACC-1001", "customerId": "CUST-2810", "beneficiaryId": "BEN-3477", "direction": "debit", "type": "EFT payment", "amount": 8500, "currency": "ZAR", "status": "Completed", "timestamp": "2026-08-31T14:22:00+02:00", "description": "Process design workshop", "counterparty": "Lebo Consulting", "reference": "LEBO-0826", "channel": "Web", "deviceId": "DEV-1102", "employeeId": "EMP-2204", "riskFactors": { "customerAverageAmount": 16000 }
+    }
+  ]
+}

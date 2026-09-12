@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "AVVA — Fraud Operations",
+  "short_name": "AVVA",
+  "version": "0.1.0",
+  "description": "Securely connect your browser to the AVVA fraud operations dashboard.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:5173/*",
+    "http://127.0.0.1:8787/*",
+    "http://localhost:5173/*",
+    "http://localhost:8787/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Open AVVA"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://127.0.0.1:5173/*",
+        "http://localhost:5173/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
