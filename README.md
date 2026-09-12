@@ -1,56 +1,78 @@
 <div align="center">
 
-  <img src="./assets/avva-logo.png" alt="AVVA Logo" width="280" />
+<img src="./public/avva-logo.png" alt="AVVA Logo" width="340" />
 
-  <h1>Agent-as-a-Service for Enterprise Transaction Intelligence</h1>
+<br />
+<br />
 
-  <p>
-    AVVA embeds an AI investigation agent directly into enterprise transaction dashboards to analyse activity, connect context, explain risk signals, and surface actionable insights.
-  </p>
+# Agent-as-a-Service for Enterprise Transaction Intelligence
 
-  <p>
-    <strong>Browser Agent · Transaction Intelligence · Agentic Investigation · Human-in-the-Loop</strong>
-  </p>
+### Analyse transactions. Connect context. Surface actionable intelligence.
+
+AVVA embeds an AI investigation agent directly into the enterprise dashboards teams already use — understanding transaction context, analysing activity, connecting related signals, and delivering explainable insights without forcing users to leave their workflow.
+
+<br />
+
+[![Agent as a Service](https://img.shields.io/badge/Agent--as--a--Service-AVVA-111111?style=for-the-badge)](#)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](#)
+[![OpenAI](https://img.shields.io/badge/OpenAI-Agent-111111?style=for-the-badge&logo=openai&logoColor=white)](#)
+[![React](https://img.shields.io/badge/React-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](#)
+
+<br />
+
+**Browser Agent** · **Transaction Intelligence** · **Context-Aware AI** · **Explainable Insights** · **Human-in-the-Loop**
 
 </div>
 
 ---
 
-## Overview
+## AVVA
 
-**AVVA is an Agent-as-a-Service platform for enterprise transaction intelligence.**
+**AVVA is an Agent-as-a-Service intelligence layer for enterprise transaction systems.**
 
-Enterprise platforms already show teams transactions, balances, customers, beneficiaries, alerts, and risk indicators.
+Enterprise platforms are very good at displaying transactions.
 
-AVVA adds the intelligence layer on top.
+AVVA gives those transactions an intelligence layer.
 
-Instead of asking analysts to leave their workflow, open a separate AI tool, copy transaction details, and manually explain the context, AVVA works directly inside the enterprise dashboard through a browser extension.
+Instead of replacing an organisation's existing banking, payment, ERP, insurance, government, or financial systems, AVVA works directly on top of them through a lightweight browser extension.
 
-When an employee opens a transaction, AVVA can understand the approved transaction context, investigate surrounding activity, connect related evidence, and explain what may require attention.
+When an employee opens a transaction, AVVA understands the approved context surrounding that transaction and can begin analysing it immediately.
 
-The goal is simple:
+AVVA can help answer:
 
-> **Enterprise dashboards show the transaction. AVVA investigates it.**
+> **What happened?**
+
+> **Why is this transaction unusual?**
+
+> **What activity is connected to it?**
+
+> **What should the analyst investigate next?**
+
+> **What action should be considered?**
+
+The result is an AI coworker that works **inside the systems where transaction decisions already happen.**
 
 ---
 
-## What We Built
+## Built for AI Tinkerers — Agents, Everywhere
 
-For the AI Tinkerers hackathon, we built a working AVVA prototype consisting of two main components:
+> **Build an agent for a place people already work, talk, and live, then make it meaningfully more useful because of that context.**
 
-### 1. AVVA Browser Agent
+AVVA brings the agent directly into an environment where financial and operational teams already spend their time:
 
-A Chrome Manifest V3 extension that works alongside an enterprise transaction dashboard.
+### The enterprise transaction dashboard.
 
-The extension can recognise explicitly approved transaction context such as:
+Traditional AI workflows require users to:
 
 ```text
-Transaction ID
-Amount
-Currency
-Customer
-Beneficiary
-Risk
-Status
-Employee
-Device
+Leave their dashboard
+        ↓
+Open another AI application
+        ↓
+Copy transaction details
+        ↓
+Explain what they are looking at
+        ↓
+Ask the correct questions
+        ↓
+Return to the enterprise system
